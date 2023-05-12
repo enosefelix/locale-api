@@ -1,4 +1,4 @@
-function generateRandomString(length) {
+function generateRandomString(length: number) {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let randomString = '';
     for (let i = 0; i < length; i++) {
@@ -7,4 +7,5 @@ function generateRandomString(length) {
     }
     return randomString;
 }
-module.exports = {generateRandomString}
+
+export {generateRandomString}

@@ -1,5 +1,7 @@
-function validateRequiredFields(fields) {
-    return function (req, res, next) {
+import { NextFunction, Request, Response } from "express";
+
+function validateRequiredFields(fields: string[]) {
+    return function (req: Request, res: Response, next: NextFunction) {
         const missingFields = fields.filter((field) => !(field in req.body));
         if (missingFields.length > 0) {
             res.status(400).json({
@@ -11,4 +13,4 @@ function validateRequiredFields(fields) {
     };
 }
 
-module.exports = {validateRequiredFields}
+export {validateRequiredFields}

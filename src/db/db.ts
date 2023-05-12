@@ -1,10 +1,11 @@
-const mongoose = require('mongoose');
-require('dotenv').config()
-require('dotenv').config({ path: 'example.env' })
+import mongoose from'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
 
+const MONGO_URL = process.env.MONGO_URL as string;
 
-function connectMongoDB() {
-    mongoose.connect(process.env.MONGO_URL)
+function connectMongoDB(): void {
+    mongoose.connect(MONGO_URL)
     mongoose.connection.on('connected', () => {
         console.log('Connected to MongoDB Successfully');
     })
@@ -14,4 +15,4 @@ function connectMongoDB() {
     })
 }
 
-module.exports = { connectMongoDB }
+export { connectMongoDB }

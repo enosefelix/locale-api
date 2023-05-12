@@ -1,9 +1,10 @@
-const { userModel } = require('../models/auth.model');
-const { generateRandomString } = require('../logic/api-logic')
-const bcrypt = require('bcrypt');
-const { apiKeyModel } = require('../models/api-keys.model')
+import { userModel } from '../models/auth.model';
+import { generateRandomString } from '../logic/api-logic';
+import * as bcrypt from 'bcrypt';
+import  { apiKeyModel } from '../models/api-keys.model';
+import { Request, Response } from 'express';
 
-async function signup(req, res) {
+async function signup(req: Request, res: Response): Promise<void | string> {
     const regex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/;
     const { email, password, first_name, last_name, retype_password } = req.body;
 
@@ -37,7 +38,7 @@ async function signup(req, res) {
         key.user = savedUser._id;
         await key.save();
 
-        return res.json({
+        res.json({
             message: "Signup successful. Welcome",
             user: {
                 email,
@@ -49,12 +50,13 @@ async function signup(req, res) {
                 API_key
             }
         })
+        return;
     } else {
         res.send("Please enter a valid");
     }
 }
 
-async function login(req, res) {
+async function login(req: Request, res: Response): Promise<void> {
     const { email, password, API_key } = req.body;
     const user = await userModel.findOne({ email }).populate('API_key_id');
 
@@ -67,11 +69,13 @@ async function login(req, res) {
         res.send('Invalid credentials');
         return;
     }
-    if (API_key !== user.API_key_id.API_key) {
+    const user_apikey = user.API_key_id as string | undefined;
+
+    if (API_key !== user_apikey) {
         res.send("Invalid API key, please check and try again");
         return;
     }
     res.send(`login successful`);
 }
 
-module.exports = { signup, login }
+export { signup, login}
