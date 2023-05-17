@@ -11,7 +11,9 @@ const apiKeySchema = new Schema({
     {
         type: Schema.Types.ObjectId,
         ref: 'users'
-    }
+    },
+    createdAt: Date,
+    createdBy: String
 });
 
 export const apiKeyModel = mongoose.model('apiKeys', apiKeySchema);

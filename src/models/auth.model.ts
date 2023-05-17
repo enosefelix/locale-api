@@ -30,8 +30,7 @@ const userSchema = new Schema({
         ref: 'apiKeys'
     },
     createdAt: {
-        type: Date,
-        default: new Date()
+        type: Date
     }
 });
 
