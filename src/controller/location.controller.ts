@@ -2,20 +2,22 @@ import { Request, Response } from "express";
 import { locationModel } from "../models/location.model";
 import { getOrSetCache } from "../logic/get-or-set-cache";
 import { apiKeyModel } from '../models/api-keys.model';
-async function findAll(req: Request, res: Response): Promise<void> {
-    const locations = await locationModel.find();
-    res.send(locations);
-}
 
 async function getRegions(req: Request, res: Response) {
-    const { api_key } = req.body;
     const region_name = req.query.region_name as string;
     const lga = req.query.lga as string;
-
     let regex = new RegExp(region_name, 'i');
     let fields = 'state region capital slogan population dialect';
 
+    const authHeader = req.headers.authorization;
 
+    if (!authHeader) {
+        res.status(401).send("Missing Authorization header");
+        return;
+    }
+    const splitAuth = authHeader.split(' ');
+
+    const api_key = splitAuth[1];
 
     try {
         const key = await getOrSetCache(`api_key_${api_key}`, async () => {
@@ -36,6 +38,11 @@ async function getRegions(req: Request, res: Response) {
             return region;
         });
 
+        if ((regions as any[]).length === 0) {
+            res.status(404).json({ message: `"${region_name}" Region not found. Please try again with valid Region name` });
+            return;
+        }
+
         res.json({ regions });
 
     } catch (error: any) {
@@ -47,13 +54,22 @@ async function getRegions(req: Request, res: Response) {
 
 
 async function getState(req: Request, res: Response) {
-    const { api_key } = req.body;
     const state_name = req.query.state_name as string;
     const lga = req.query.lga as string;
 
     let regex = new RegExp(state_name, 'i');
 
     let fields = 'state region capital slogan population dialect';
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        res.status(401).send("Missing Authorization header");
+        return;
+    }
+    const splitAuth = authHeader.split(' ');
+
+    const api_key = splitAuth[1];
 
     try {
         const key = await getOrSetCache(`api_key_${api_key}`, async () => {
@@ -81,6 +97,11 @@ async function getState(req: Request, res: Response) {
             });
         }
 
+        if ((states as any[]).length === 0) {
+            res.status(404).json({ message: `"${state_name}" State not found. Please try again with valid State name` });
+            return;
+        }
+
         res.json({
             states
         });
@@ -92,12 +113,21 @@ async function getState(req: Request, res: Response) {
 }
 
 async function getLocalGvt(req: Request, res: Response) {
-    const { api_key } = req.body;
     const lga_name = req.query.lga_name as string;
 
     let regex = new RegExp(lga_name, 'i');
 
-    let fields = 'state region capital lgas slogan population dialect';
+    let fields = 'state region lgas';
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        res.status(401).send("Missing Authorization header");
+        return;
+    }
+    const splitAuth = authHeader.split(' ');
+
+    const api_key = splitAuth[1];
 
     try {
         const key = await getOrSetCache(`api_key_${api_key}`, async () => {
@@ -113,6 +143,11 @@ async function getLocalGvt(req: Request, res: Response) {
             return lga;
         });
 
+        if ((lgas as any[]).length === 0) {
+            res.status(404).json({ message: `"${lga_name}" Local Government not found. Please try again with valid Local Government name` });
+            return;
+        }
+
         res.json({
             lgas
         });
@@ -123,4 +158,4 @@ async function getLocalGvt(req: Request, res: Response) {
     }
 }
 
-export { findAll, getRegions, getState, getLocalGvt }
+export { getRegions, getState, getLocalGvt }

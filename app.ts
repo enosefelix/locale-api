@@ -12,12 +12,10 @@ import { rateLimiter } from './src//middleware/rate-limiter';
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
-app.use(rateLimiter);
 
-
-app.use('/auth', authRouter)
+app.use('/auth', rateLimiter, authRouter)
 app.use('/verify', apiRouter)
-app.use('/location', locationRouter)
+app.use('/location', rateLimiter, locationRouter)
 
 app.get('/', (req: Request, res: Response): void => {
     res.send('Welcome to the blogging api')
