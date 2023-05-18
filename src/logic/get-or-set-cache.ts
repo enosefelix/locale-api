@@ -5,14 +5,22 @@ function getOrSetCache(key: string, cb: any) {
     return new Promise((resolve, reject) => {
         redisDb.get(key, async (error, data: any) => {
             if (error) return reject(error);
-            if (data === null) {
-                const newData = await cb();
-                redisDb.setex(key, REDIS_EXPIRATION, JSON.stringify(newData));
-                console.log('new data')
-                return resolve(newData);
+            if (data !== null) {
+                try {
+                    console.log("cached");
+                    return resolve(JSON.parse(data));
+                } catch (error) {
+                    return reject(new Error(`Unable to parse data for key ${key}: ${data}`));
+                }
             } else {
-                console.log("cached")
-                return reject(JSON.parse(data));
+                try {
+                    const newData = await cb();
+                    redisDb.setex(key, REDIS_EXPIRATION, JSON.stringify(newData));
+                    console.log('new data')
+                    return resolve(newData);
+                } catch (error) {
+                    return reject(error);
+                }
             }
         });
     });
