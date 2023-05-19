@@ -1,0 +1,161 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Locale API
+  description: 'An API to manage and return information about geographical entities such as regions, states, and local governments.'
+  license:
+    name: MIT
+    url: 'https://github.com/enosefelix/locale-api'
+servers:
+  - url: 'http://localhost:3000'
+    description: 'localhost:3000'
+paths:
+  /location/region:
+    get:
+      summary: Get a region's details
+      parameters:
+        - in: query
+          name: region_name
+          schema:
+            type: string
+          description: The name of the region.
+        - in: query
+          name: lga
+          required: false
+          schema:
+            type: boolean
+          description: Include Local Government Areas in the response. Default is false.
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Bearer [API KEY]'
+      responses:
+        '200':
+          description: Region data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Region'
+          headers: {}
+        '401':
+          description: Missing or invalid Authorization header
+        '404':
+          description: Region not found
+        '':
+          headers: {}
+    parameters: []
+  /location/state:
+    get:
+      summary: Get a region's details
+      parameters:
+        - in: query
+          name: state_name
+          schema:
+            type: string
+          description: The name of the region.
+        - in: query
+          name: lga
+          required: false
+          schema:
+            type: boolean
+          description: Include Local Government Areas in the response. Default is false.
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Bearer [API KEY]'
+      responses:
+        '200':
+          description: Region data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Region'
+          headers: {}
+        '401':
+          description: Missing or invalid Authorization header
+        '404':
+          description: Region not found
+        '':
+          headers: {}
+    parameters: []
+  /location/lga:
+    get:
+      summary: Get a Local Government Area's details
+      parameters:
+        - in: query
+          name: lga_name
+          schema:
+            type: string
+          description: The name of the Local Government Area.
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Bearer [API KEY]'
+      responses:
+        '200':
+          description: LGA data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lgas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LGA'
+        '401':
+          description: Missing or invalid Authorization header
+        '404':
+          description: LGA not found
+    parameters: []
+components:
+  schemas:
+    Region:
+      type: object
+      properties:
+        state:
+          type: string
+        region:
+          type: string
+        capital:
+          type: string
+        slogan:
+          type: string
+        population:
+          type: integer
+        dialect:
+          type: string
+        lgas:
+          type: array
+          items:
+            type: string
+    State:
+      allOf:
+        - $ref: '#/components/schemas/Region'
+    LGA:
+      type: object
+      properties:
+        state:
+          type: string
+        region:
+          type: string
+        lgas:
+          type: array
+          items:
+            type: string
+      title: ''
+  securitySchemes: {}
+  parameters: {}
