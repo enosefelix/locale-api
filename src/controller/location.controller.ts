@@ -91,7 +91,7 @@ async function getState(req: Request, res: Response) {
                 return state;
             });
         } else {
-            states = await getOrSetCache(`state_${api_key}_state_name=${state_name}_lga=${lga}`, async () => {
+            states = await getOrSetCache(`state?state_name=${state_name}?lga=${lga}`, async () => {
                 const state = await locationModel.find({ "state": regex }, fields);
                 return state;
             });
@@ -138,7 +138,7 @@ async function getLocalGvt(req: Request, res: Response) {
             return key;
         });
 
-        const lgas = await getOrSetCache(`lga_${api_key}_lga_name=${lga_name}`, async () => {
+        const lgas = await getOrSetCache(`lga?lga_name=${lga_name}`, async () => {
             const lga = await locationModel.find({ "lgas": regex }, fields);
             return lga;
         });
