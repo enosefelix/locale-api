@@ -10,22 +10,20 @@ async function signup(req: Request, res: Response): Promise<void | string> {
 
     if (regex.test(email)) {
         const foundUser = await userModel.findOne({ email });
-
         const API_key = generateRandomString(32)
 
         if (password !== retype_password) {
-            res.status(400).send("Passwords do not match"); // Bad Request
+            res.status(400).send("Passwords do not match");
             return;
         }
 
         if (foundUser) {
-            res.status(409).send("User already exists, try logging in"); // Conflict
+            res.status(409).send("User already exists, try logging in");
             return;
         }
 
-        const apiKey = await apiKeyModel.create({ API_key, createdAt: Date.now() })
+        const apiKey = await apiKeyModel.create({ API_key, createdAt: Date.now()})
         const key = await apiKey.save();
-
         const user = await userModel.create({
             email,
             password,
@@ -33,8 +31,8 @@ async function signup(req: Request, res: Response): Promise<void | string> {
             last_name,
             retype_password,
             API_key_id: key._id,
-            createdAt: Date.now()
         })
+
         const savedUser = await user.save()
 
         key.user = savedUser._id;
@@ -46,14 +44,14 @@ async function signup(req: Request, res: Response): Promise<void | string> {
             user: {
                 email,
                 first_name,
-                last_name
+                last_name,
             },
             notice: "Please ensure that you write down this API_key, it is a view once, and cannot be retrieved, retrieving is $200. View API key below: ",
             API_key
         });
         return;
     } else {
-        res.send("Please enter a valid");
+        res.status(401).send("Please enter a valid email");
     }
 }
 
@@ -80,7 +78,7 @@ async function verify(req: Request, res: Response): Promise<void> {
     const user_apikey = (user.API_key_id as unknown as { API_key: string }).API_key;
 
     if (API_key !== user_apikey) {
-        res.status(401).send("Invalid API key, please check that you are using your API key and try again");
+        res.status(401).send("Invalid API key, please check that you are using your own API key and try again");
         return;
     }
     res.status(200).send(`API key has been verified and is valid`);

@@ -95,14 +95,12 @@ async function getState(req: Request, res: Response) {
                 `state?state_name=${state_name}?lga=${lga}`,
                 async () => {
                     const splitName = state_name.split(', ');
-
                     const mapped: any = splitName.map((state: string) => {
                         let regex = new RegExp(state, 'i');
                         return { state: regex };
                     });
 
                     const state = await locationModel.find({ $or: mapped }, fields);
-
                     const inputStates = splitName.length;
                     const foundStates = state.length;
 

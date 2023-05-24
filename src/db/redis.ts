@@ -1,13 +1,20 @@
-import Redis from 'ioredis';
 import dotenv from 'dotenv';
 dotenv.config();
-const REDIS_URL = process.env.REDIS_URL;
+import Redis from 'ioredis';
+import { createClient } from 'redis';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
+const REDIS_HOST = process.env.REDIS_HOST;
+const REDIS_PORT = process.env.REDIS_PORT as number | undefined;
+console.log("🚀 ~ file: redis.ts:8 ~ REDIS_PORT:", REDIS_PORT)
 
 function getRedisUrl(): any {
-    if (REDIS_URL) {
-        return REDIS_URL
+const client = createClient({
+    password: REDIS_PASSWORD,
+    socket: {
+        host: REDIS_HOST,
+        port: REDIS_PORT
     }
-    throw new Error('Error while fetching redis url')
+});
 }
 
 export const redisDb = new Redis(getRedisUrl())

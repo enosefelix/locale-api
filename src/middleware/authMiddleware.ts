@@ -4,7 +4,6 @@ import { apiKeyModel } from "../models/api-keys.model";
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
-    console.log("🚀 ~ file: authMiddleware.ts:7 ~ authMiddleware ~ authHeader:", authHeader)
 
     if (!authHeader) {
         return res.status(401).send('Missing Authorization header');
