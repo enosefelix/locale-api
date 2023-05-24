@@ -14,12 +14,12 @@ async function signup(req: Request, res: Response): Promise<void | string> {
         const API_key = generateRandomString(32)
 
         if (password !== retype_password) {
-            res.send("Passwords do not match")
+            res.status(400).send("Passwords do not match"); // Bad Request
             return;
         }
 
         if (foundUser) {
-            res.send("User already exists, try logging in")
+            res.status(409).send("User already exists, try logging in"); // Conflict
             return;
         }
 
@@ -41,7 +41,7 @@ async function signup(req: Request, res: Response): Promise<void | string> {
         key.createdBy = `${first_name} ${last_name}`;
         await key.save();
 
-        res.json({
+        res.status(201).json({
             message: "Signup successful. Welcome",
             user: {
                 email,
@@ -50,14 +50,14 @@ async function signup(req: Request, res: Response): Promise<void | string> {
             },
             notice: "Please ensure that you write down this API_key, it is a view once, and cannot be retrieved, retrieving is $200. View API key below: ",
             API_key
-        })
+        });
         return;
     } else {
         res.send("Please enter a valid");
     }
 }
 
-async function login(req: Request, res: Response): Promise<void> {
+async function verify(req: Request, res: Response): Promise<void> {
     const { email, password, API_key } = req.body;
     const user = await userModel.findOne({ email })
         .populate({
@@ -66,22 +66,24 @@ async function login(req: Request, res: Response): Promise<void> {
         });
 
     if (!user) {
-        res.send("User doesn't exist, Signup");
+        res.status(404).send("User doesn't exist, Signup");
         return;
     }
+
     const match = await bcrypt.compare(password, user.password);
+
     if (!match) {
-        res.send('Invalid credentials');
+        res.status(401).send('Invalid credentials');
         return;
     }
 
     const user_apikey = (user.API_key_id as unknown as { API_key: string }).API_key;
 
     if (API_key !== user_apikey) {
-        res.send("Invalid API key, please check and try again");
+        res.status(401).send("Invalid API key, please check that you are using your API key and try again");
         return;
     }
-    res.send(`login successful`);
+    res.status(200).send(`API key has been verified and is valid`);
 }
 
-export { signup, login }
+export { signup, verify }

@@ -1,11 +1,12 @@
 import { getRegions, getState, getLocalGvt } from "../controller/location.controller";
 import express from 'express';
+import { authMiddleware } from "../middleware/authMiddleware";
 const locationRouter = express.Router()
 
-locationRouter.get('/region', getRegions);
+locationRouter.get('/region', authMiddleware, getRegions);
 
-locationRouter.get('/state', getState);
+locationRouter.get('/state', authMiddleware, getState);
 
-locationRouter.get('/lga', getLocalGvt);
+locationRouter.get('/lga', authMiddleware, getLocalGvt);
 
 export = locationRouter;
