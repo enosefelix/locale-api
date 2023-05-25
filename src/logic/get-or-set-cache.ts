@@ -1,29 +1,28 @@
-import { redisDb } from '../db/redis';
+import client from '../db/redis';
+import dotenv from 'dotenv';
+dotenv.config();
 const REDIS_EXPIRATION = process.env.REDIS_EXPIRATION as string;
 
-function getOrSetCache(key: string, cb: any) {
-    return new Promise((resolve, reject) => {
-        redisDb.get(key, async (error, data: any) => {
-            if (error) return reject(error);
-            if (data !== null) {
-                try {
-                    console.log("cached");
-                    return resolve(JSON.parse(data));
-                } catch (error) {
-                    return reject(new Error(`Unable to parse data for key ${key}: ${data}`));
-                }
-            } else {
-                try {
-                    const newData = await cb();
-                    redisDb.setex(key, REDIS_EXPIRATION, JSON.stringify(newData));
-                    console.log('new data')
-                    return resolve(newData);
-                } catch (error) {
-                    return reject(error);
-                }
-            }
-        });
-    });
+async function getOrSetCache(key: string, cb: () => Promise<any>) {
+    try {
+        const data = await client.get(key);
+        if (data) {
+            console.log("Cached");
+            return JSON.parse(data);
+        }
+    } catch (error) {
+        console.error(`Error getting data from Redis for key ${key}: ${error}`);
+    }
+
+    try {
+        const newData = await cb();
+        await client.setEx(key, parseInt(REDIS_EXPIRATION), JSON.stringify(newData));
+        console.log('New data');
+        return newData;
+    } catch (error) {
+        console.error(`Error setting new data in Redis for key ${key}: ${error}`);
+        throw error;
+    }
 }
 
-export { getOrSetCache }
+export {getOrSetCache};

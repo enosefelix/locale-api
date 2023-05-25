@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import { locationModel } from "../models/location.model";
-import { getOrSetCache } from "../logic/get-or-set-cache";
+import {getOrSetCache} from "../logic/get-or-set-cache";
 
 async function getRegions(req: Request, res: Response) {
     const region_name = req.query.region_name as string;
