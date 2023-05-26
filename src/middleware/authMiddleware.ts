@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { getOrSetCache } from "../logic/get-or-set-cache";
 import { apiKeyModel } from "../models/api-keys.model";
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -10,13 +9,13 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     }
 
     try {
-        const key = await getOrSetCache(`api_key_${authHeader}`, async () => {
+        const key = async () => {
             const key = await apiKeyModel.findOne({ "API_key": authHeader });
             if (key === null) {
                 throw new Error('Invalid API_key');
             }
             return key;
-        });
+        };
         next();
     } catch (error) {
         res.status(401).send('Invalid API Key');

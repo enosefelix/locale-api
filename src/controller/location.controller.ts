@@ -1,11 +1,11 @@
 import { Response, Request } from "express";
 import { locationModel } from "../models/location.model";
-import {getOrSetCache} from "../logic/get-or-set-cache";
+import { getOrSetCache } from "../logic/get-or-set-cache";
 
 async function getRegions(req: Request, res: Response) {
     const region_name = req.query.region_name as string;
     const lga = req.query.lga as string;
-    let fields = 'state region capital slogan population dialect';
+    let fields = 'state region capital slogan population dialect longitude latitude landmass senatorial_districts created_date known_for borders';
 
     try {
         if (lga === 'true') {
@@ -72,8 +72,7 @@ async function getState(req: Request, res: Response) {
     try {
         const state_name = req.query.state_name as string;
         const lga = req.query.lga as string;
-        let fields = 'state region capital slogan population dialect';
-
+        let fields = 'region state capital slogan population dialect longitude latitude landmass created_date senatorial_districts known_for borders';
         if (lga === 'true') {
             fields += ' lgas';
         }
@@ -131,7 +130,7 @@ async function getState(req: Request, res: Response) {
 async function getLocalGvt(req: Request, res: Response) {
     const lga_name = req.query.lga_name as string;
 
-    let fields = 'state lgas';
+    let fields = 'state lgas region';
     let lgas;
 
     try {
