@@ -14,27 +14,36 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-* Node.js and npm installed on your local machine. [Install](https://nodejs.org/en/download/)
-* MongoDB installed on your local machine. [Install](https://docs.mongodb.com/manual/installation/)
+- Node.js and npm installed on your local machine. [Install](https://nodejs.org/en/download/)
+- MongoDB installed on your local machine. [Install](https://docs.mongodb.com/manual/installation/)
+- Redis installed on your local machine. [this link](https://redis.io/docs/getting-started/) for guideline
+
+I have hosted it on: 
 
 ### Installation
 
 1. Clone the repository:
-    ```
-    git clone https://github.com/yourusername/location-data-api.git
-    ```
+   ```
+   git clone https://github.com/enosefelix/locale-api.git
+   ```
 2. Navigate into the project directory:
-    ```
-    cd location-data-api
-    ```
+   ```
+   cd locale-api
+   ```
 3. Install the project dependencies:
+   ```
+   npm install
+   ```
+4. Make a copy of .env.sample as .env and populate file with required credentials
+
+    ```sh
+    cp .env.sample .env
     ```
-    npm install
-    ```
-4. Start the development server:
-    ```
-    npm start
-    ```
+
+5. Start the development server:
+   ```
+   npm start:dev
+   ```
 
 ---
 
@@ -52,16 +61,21 @@ The API provides the following endpoints:
 
 3. **Get Local Government**: `/lga`
 
-   Fetches the data of a specific local government.
+   Fetches the data of a specific or all local government.
 
 ---
 
 ### API Usage
 
+To test on your local with swagger, use
+```
+localhost:3000/api-docs
+```
+
 The API uses bearer token for authorization, so you have to include your API key in the Authorization header as follows:
 
 ```
-Authorization: Bearer your_api_key
+Authorization: your_api_key
 ```
 
 Here is an example of how to use the API:
@@ -70,14 +84,45 @@ Here is an example of how to use the API:
 
 ```
 GET /state?state_name=lagos&lga=true
-Authorization: Bearer your_api_key
+Authorization: your_api_key
 ```
 
 **Response:**
 
 ```
 {
-    "states": [...]
+    "states": {
+  "states": [
+    {
+      "_id": "64707c54230400407f446809",
+      "region": "South West",
+      "state": "Lagos",
+      "capital": "Ikeja",
+      "slogan": "Centre of Excellence",
+      "landmass": "3,577 km2 (1,380 sq mi)",
+      "population": "9,013,534",
+      "dialect": "Yoruba",
+      "latitude": "6.5244",
+      "longitude": "3.3792",
+      "created_date": "1967-05-26T23:00:00.000Z",
+      "senatorial_districts": [
+        "Lagos West",
+        "Lagos Central",
+        "Lagos East"
+      ],
+      "borders": [
+        "Ogun",
+        "Ondo"
+      ],
+      "known_for": [
+        "National Museum Lagos",
+        "National Arts Theatre",
+        "National Museum Lagos",
+        "National Arts Theatre"
+      ]
+    }
+  ]
+}
 }
 ```
 
@@ -89,18 +134,8 @@ If you would like to contribute to this project, please feel free to fork the re
 
 ---
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
 ## Contact
 
 If you have any questions about this project, please feel free to open an issue or directly contact the project owner.
 
 ---
-
-## Acknowledgements
-
-Thanks to everyone who has contributed to this project and supported it.
