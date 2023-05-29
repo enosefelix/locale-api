@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import { createClient } from '@node-redis/client';
-const REDIS_URL = process.env.REDIS_URL
+const REDIS_URL = process.env.REDIS_URL;
 
 const client = createClient({
     url: REDIS_URL

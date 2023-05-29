@@ -1,6 +1,11 @@
 import { Response, Request } from "express";
 import { locationModel } from "../models/location.model";
 import { getOrSetCache } from "../logic/get-or-set-cache";
+import { InvalidQueryError } from "../enums/query_Required";
+
+async function getAll(req: Request, res: Response) {
+    
+}
 
 async function getRegions(req: Request, res: Response) {
     const region_name = req.query.region_name as string;
@@ -14,10 +19,8 @@ async function getRegions(req: Request, res: Response) {
 
         let regions: any;
         if (!region_name && !lga) {
-            regions = await getOrSetCache(`region`, async () => {
-                const region = await locationModel.find({}, fields);
-                return region;
-            });
+            res.status(401).send(InvalidQueryError.REGION_ERROR);
+            return;
         } else if (!region_name && lga) {
             regions = await getOrSetCache(`region?lga=${lga}`, async () => {
                 const region = await locationModel.find({}, fields);
@@ -80,10 +83,8 @@ async function getState(req: Request, res: Response) {
         let states: any;
 
         if (!state_name && !lga) {
-            states = await getOrSetCache(`state`, async () => {
-                const state = await locationModel.find({}, fields);
-                return state;
-            });
+            res.status(401).send(InvalidQueryError.STATE_ERROR);
+            return;
         } else if (!state_name && lga) {
             states = await getOrSetCache(`state?lga=${lga}`, async () => {
                 const state = await locationModel.find({}, fields);
@@ -135,10 +136,8 @@ async function getLocalGvt(req: Request, res: Response) {
 
     try {
         if (!lga_name) {
-            lgas = await getOrSetCache(`lga`, async () => {
-                const lga = await locationModel.find({}, fields);
-                return lga;
-            });
+            res.status(401).send(InvalidQueryError.LGA_ERROR);
+            return;
         }
         else {
             lgas = await getOrSetCache(`lga?lga_name=${lga_name}`, async () => {
@@ -167,4 +166,4 @@ async function getLocalGvt(req: Request, res: Response) {
     }
 }
 
-export { getRegions, getState, getLocalGvt }
+export { getRegions, getState, getLocalGvt, getAll }
