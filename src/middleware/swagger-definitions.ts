@@ -10,7 +10,7 @@ export const swaggerDefinition = {
             version: '1.0.0',
             description: 'API Documentation',
         },
-        host: WEB_HOST || 'localhost:3000',
+        host: WEB_HOST,
         basePath: '/',
         securityDefinitions: {
             ApiKeyAuth: {

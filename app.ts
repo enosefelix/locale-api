@@ -24,7 +24,7 @@ app.use('/auth', rateLimiter, authRouter)
 app.use('/location', rateLimiter, locationRouter)
 
 app.get('/', (req: Request, res: Response): void => {
-    res.send('Welcome to the blogging api')
+    res.send('Welcome to the location api')
 })
 
 connectMongoDB()
