@@ -5,11 +5,9 @@
  *     properties:
  *       email:
  *         type: string
+ *       username:
+ *         type: string
  *       password:
- *         type: string
- *       first_name:
- *         type: string
- *       last_name:
  *         type: string
  *       retype_password:
  *         type: string
@@ -33,21 +31,17 @@
  *         schema:
  *           type: object
  *           required:
+ *             - username
  *             - email
  *             - password
- *             - first_name
- *             - last_name
  *             - retype_password
  *           properties:
+ *             username:
+ *               type: string
+ *               description: User's preferred username
  *             email:
  *               type: string
  *               description: Email of the user
- *             first_name:
- *               type: string
- *               description: User's first name
- *             last_name:
- *               type: string
- *               description: User's last name
  *             password:
  *               type: string
  *               description: User's password
@@ -81,15 +75,11 @@ exports.signupDoc = {}
  *           type: object
  *           required:
  *             - email
- *             - password
  *             - API_key
  *           properties:
  *             email:
  *               type: string
  *               description: Email to use for login.
- *             password:
- *               type: string
- *               description: User's password.
  *             API_key:
  *               type: string
  *               description: User's API key.
@@ -151,6 +141,58 @@ exports.verifyDoc = {}
 
 /**
  * @swagger
+ * /location:
+ *   get:
+ *     summary: Get all locations
+ *     security:
+ *       - ApiKeyAuth: []
+ *     tags:
+ *       - All locations
+ *     parameters:
+ *       - in: query
+ *         name: state_sort
+ *         required: false
+ *         type: string
+ *         enum: [asc, desc]
+ *         description: Descending or Ascending order
+ *       - in: query
+ *         name: population_sort
+ *         required: false
+ *         type: string
+ *         enum: [asc, desc]
+ *         description: Descending or Ascending order
+ *       - in: query
+ *         name: maxPopulation
+ *         required: false
+ *         type: number
+ *         description: max population number
+ *       - in: query
+ *         name: minPopulation
+ *         required: false
+ *         type: number
+ *         description: min population number
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         type: number
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         type: number
+ *         description: number of items per page
+ *     responses:
+ *       200:
+ *         description: A list of all locations
+ *       401:
+ *         description: Missing or Invalid Authorization header
+ *       404:
+ *         description: Region not found
+ */
+exports.allLocationDoc = {}
+
+/**
+ * @swagger
  * /location/region:
  *   get:
  *     summary: Get regions based on the provided region name
@@ -165,9 +207,10 @@ exports.verifyDoc = {}
  *         type: string
  *         description: Name of the region
  *       - in: query
- *         name: lga
+ *         name: lgas
  *         required: false
  *         type: string
+ *         enum: [true]
  *         description: Local Government Area
  *     responses:
  *       200:
@@ -195,9 +238,10 @@ exports.regionsDoc = {}
  *         type: string
  *         description: Name of the state
  *       - in: query
- *         name: lga
+ *         name: lgas
  *         required: false
  *         type: string
+ *         enum: [true]
  *         description: Local Government Area
  *     responses:
  *       200:

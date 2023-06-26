@@ -1,57 +1,78 @@
 import { Response, Request } from "express";
 import { locationModel } from "../models/location.model";
 import { getOrSetCache } from "../logic/get-or-set-cache";
-import { InvalidQueryError } from "../enums/query_Required";
+import { InvalidQueryError } from "../enums/enums";
 
 async function getAll(req: Request, res: Response) {
-    
+    let skip;
+    const stateSort = req.query.state_sort as string;
+    const populationSort = req.query.population_sort as string;
+    let fields = 'state region capital slogan population dialect longitude latitude landmass senatorial_districts created_date known_for borders lgas';
+    const page = Number(req.query.page) * 1 || 1;
+    const limit = Number(req.query.limit) * 1 || 20;
+    skip = (page - 1) * limit;
+    let sortQuery: any = {};
+
+    if (stateSort === "desc") {
+        sortQuery.state = -1;
+    } else if (stateSort === "asc") {
+        sortQuery.state = 1;
+    } else if (populationSort === "desc") {
+        sortQuery.population = -1;
+    } else if (populationSort === "asc") {
+        sortQuery.population = 1;
+    }
+
+    const minPopulation = Number(req.query.minPopulation);
+    const maxPopulation = Number(req.query.maxPopulation);
+
+    let findQuery: any = {};
+
+    if (minPopulation || maxPopulation) {
+        findQuery.population = {};
+    }
+
+    if (minPopulation) {
+        findQuery.population.$gt = minPopulation;
+    }
+
+    if (maxPopulation) {
+        findQuery.population.$lt = maxPopulation - 1000000;
+    }
+
+    const locations = await locationModel.find(findQuery, fields).sort(sortQuery).skip(skip).limit(limit);
+    res.send(locations)
 }
 
 async function getRegions(req: Request, res: Response) {
     const region_name = req.query.region_name as string;
-    const lga = req.query.lga as string;
+    const lgas = req.query.lga as string;
     let fields = 'state region capital slogan population dialect longitude latitude landmass senatorial_districts created_date known_for borders';
 
     try {
-        if (lga === 'true') {
+        if (lgas === 'true') {
             fields += ' lgas';
         }
 
         let regions: any;
-        if (!region_name && !lga) {
+        if (!region_name && !lgas) {
             res.status(401).send(InvalidQueryError.REGION_ERROR);
             return;
-        } else if (!region_name && lga) {
-            regions = await getOrSetCache(`region?lga=${lga}`, async () => {
-                const region = await locationModel.find({}, fields);
-                return region;
-            });
-        } else {
+        }  else {
             regions = await getOrSetCache(
-                `region?region_name=${region_name}?lga=${lga}`,
+                `region?region_name=${region_name}?lga=${lgas}`,
                 async () => {
                     const splitName = region_name.split(', ');
+                    console.log("🚀 ~ file: location.controller.ts:71 ~ splitName:", splitName)
 
                     const mapped: any = splitName.map((region: string) => {
                         let regex = new RegExp(region, 'i');
                         return { region: regex };
                     });
+                    console.log("🚀 ~ file: location.controller.ts:76 ~ constmapped:any=splitName.map ~ mapped:", mapped)
 
                     const region = await locationModel.find({ $or: mapped }, fields);
 
-                    const inputRegions = splitName.length;
-                    const foundRegions = region.length;
-
-                    if (foundRegions < inputRegions) {
-                        const notFoundRegions = inputRegions - foundRegions;
-                        const errorMessage = `${notFoundRegions} region(s) were not found in the database. Please check that you are inputting valid state names.`;
-
-                        res.status(404).json({
-                            "error": errorMessage,
-                            region
-                        });
-                        return;
-                    }
                     return region;
                 }
             );
@@ -74,25 +95,25 @@ async function getRegions(req: Request, res: Response) {
 async function getState(req: Request, res: Response) {
     try {
         const state_name = req.query.state_name as string;
-        const lga = req.query.lga as string;
+        const lgas = req.query.lga as string;
         let fields = 'region state capital slogan population dialect longitude latitude landmass created_date senatorial_districts known_for borders';
-        if (lga === 'true') {
+        if (lgas === 'true') {
             fields += ' lgas';
         }
 
         let states: any;
 
-        if (!state_name && !lga) {
+        if (!state_name && !lgas) {
             res.status(401).send(InvalidQueryError.STATE_ERROR);
             return;
-        } else if (!state_name && lga) {
-            states = await getOrSetCache(`state?lga=${lga}`, async () => {
+        } else if (!state_name && lgas) {
+            states = await getOrSetCache(`state?lga=${lgas}`, async () => {
                 const state = await locationModel.find({}, fields);
                 return state;
             });
         } else {
             states = await getOrSetCache(
-                `state?state_name=${state_name}?lga=${lga}`,
+                `state?state_name=${state_name}?lga=${lgas}`,
                 async () => {
                     const splitName = state_name.split(', ');
                     const mapped: any = splitName.map((state: string) => {

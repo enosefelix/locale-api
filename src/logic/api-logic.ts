@@ -1,11 +1,11 @@
-function generateRandomString(length: number) {
+function generateAPIKey(length: number) {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let randomString = '';
+    let APIKey = '';
     for (let i = 0; i < length; i++) {
         const randomIndex = Math.floor(Math.random() * characters.length);
-        randomString += characters[randomIndex];
+        APIKey += characters[randomIndex];
     }
-    return randomString;
+    return APIKey;
 }
 
-export {generateRandomString}
+export {generateAPIKey}

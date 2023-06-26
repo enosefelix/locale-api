@@ -1,16 +1,16 @@
 import { userModel } from '../models/auth.model';
-import { generateRandomString } from '../logic/api-logic';
+import { generateAPIKey } from '../logic/api-logic';
 import * as bcrypt from 'bcrypt';
 import { apiKeyModel } from '../models/api-keys.model';
 import { Request, Response } from 'express';
 
 async function signup(req: Request, res: Response): Promise<void | string> {
     const regex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/;
-    const { email, password, first_name, last_name, retype_password } = req.body;
+    const { email, password, username, retype_password } = req.body;
 
     if (regex.test(email)) {
         const foundUser = await userModel.findOne({ email });
-        const API_key = generateRandomString(32)
+        const API_key = generateAPIKey(32)
 
         if (password !== retype_password) {
             res.status(400).send("Passwords do not match");
@@ -27,8 +27,7 @@ async function signup(req: Request, res: Response): Promise<void | string> {
         const user = await userModel.create({
             email,
             password,
-            first_name,
-            last_name,
+           username,
             retype_password,
             API_key_id: key._id,
         })
@@ -36,17 +35,16 @@ async function signup(req: Request, res: Response): Promise<void | string> {
         const savedUser = await user.save()
 
         key.user = savedUser._id;
-        key.createdBy = `${first_name} ${last_name}`;
+        key.createdBy = `${username}`;
         await key.save();
 
         res.status(201).json({
             message: "Signup successful. Welcome",
             user: {
                 email,
-                first_name,
-                last_name,
+                username
             },
-            notice: "Please ensure that you write down this API_key, it is a view once, and cannot be retrieved, retrieving is $200. View API key below: ",
+            notice: "Please ensure that you write down this API_key, it is a view once, and cannot be retrieved, only verified. View API key below: ",
             API_key
         });
         return;
@@ -56,7 +54,7 @@ async function signup(req: Request, res: Response): Promise<void | string> {
 }
 
 async function verify(req: Request, res: Response): Promise<void> {
-    const { email, password, API_key } = req.body;
+    const { email, API_key } = req.body;
     const user = await userModel.findOne({ email })
         .populate({
             path: 'API_key_id',
@@ -65,13 +63,6 @@ async function verify(req: Request, res: Response): Promise<void> {
 
     if (!user) {
         res.status(404).send("User doesn't exist, Signup");
-        return;
-    }
-
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match) {
-        res.status(401).send('Invalid credentials');
         return;
     }
 

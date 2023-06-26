@@ -16,6 +16,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 - Node.js and npm installed on your local machine. [Install](https://nodejs.org/en/download/)
 - MongoDB installed on your local machine. [Install](https://docs.mongodb.com/manual/installation/)
+
 - Redis installed on your local machine. [this link](https://redis.io/docs/getting-started/) for guideline
 
 I have hosted it on: 
@@ -123,6 +124,83 @@ Authorization: your_api_key
     }
   ]
 }
+}
+```
+
+You could also search for multiple states, regions or local govenments if you wish
+
+**Request:**
+
+```
+GET /state?state_name=lagos,edo&lga=false
+Authorization: your_api_key
+```
+
+**Response:**
+
+```
+{
+    "states": [
+        {
+            "_id": "6475d1902321f1fdfa4a8c73",
+            "region": "South South",
+            "state": "Edo",
+            "capital": "Benin City",
+            "slogan": "Heartbeat of the Nation",
+            "landmass": "17,802 km2 (6,873 sq mi)",
+            "population": "3,233,366",
+            "dialect": "Bini",
+            "latitude": "6.3167",
+            "longitude": "8.1000",
+            "created_date": "1991-08-26T23:00:00.000Z",
+            "senatorial_districts": [
+                "Edo South",
+                "Edo Central",
+                "Edo North"
+            ],
+            "borders": [
+                "Delta",
+                "Kogi",
+                "Ondo",
+                "Anambra",
+                "Rivers"
+            ],
+            "known_for": [
+                "Benin Moat, Benin City",
+                "Benin National Museum, Benin City",
+                "Emotan Statue, Benin City",
+                "Igun Bronze Casters Guild, Benin City"
+            ]
+        },
+        {
+            "_id": "6475d1902321f1fdfa4a8c80",
+            "region": "South West",
+            "state": "Lagos",
+            "capital": "Ikeja",
+            "slogan": "Centre of Excellence",
+            "landmass": "3,577 km2 (1,380 sq mi)",
+            "population": "9,013,534",
+            "dialect": "Yoruba",
+            "latitude": "6.5244",
+            "longitude": "3.3792",
+            "created_date": "1967-05-26T23:00:00.000Z",
+            "senatorial_districts": [
+                "Lagos West",
+                "Lagos Central",
+                "Lagos East"
+            ],
+            "borders": [
+                "Ogun",
+                "Ondo"
+            ],
+            "known_for": [
+                "National Museum Lagos",
+                "National Arts Theatre",
+                "National Museum Lagos",
+                "National Arts Theatre"
+            ]
+        }
+    ]
 }
 ```
 

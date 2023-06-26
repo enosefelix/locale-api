@@ -18,14 +18,10 @@ const swaggerSpec = swaggerJSDoc(swaggerDefinition);
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/auth', rateLimiter, authRouter)
 app.use('/location', rateLimiter, locationRouter)
-
-app.get('/', (req: Request, res: Response): void => {
-    res.send('Welcome to the location api')
-})
 
 connectMongoDB()
 
